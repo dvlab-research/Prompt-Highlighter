@@ -1,0 +1,34 @@
+{
+    "questions":[
+        {
+            "question_id": 1,
+            "image": "01_football.png",
+            "text": "Describe this image."
+        },
+        {
+            "question_id": 5,
+            "image": "02_klee.png",
+            "text": "Write a story about the image."
+        },
+        {
+            "question_id": 6,
+            "image": "08_obama.png",
+            "text": "What are they doing?"
+        },
+        {
+            "question_id": 7,
+            "image": "04_mplug_4.png",
+            "text": "Is there any text in the image? Why people may find this image interesting?"
+        },
+        {
+            "question_id": 7,
+            "image": "05_mplug_1.png",
+            "text": "What is funny about this image? Describe it panel by panel."
+        },
+        {
+            "question_id": 8,
+            "image": "09_lmy.png",
+            "text": "Describe this image."
+        }
+    ]
+}

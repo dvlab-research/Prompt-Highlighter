@@ -1,0 +1,142 @@
+{
+    "questions":[
+        {
+            "question_id": 1,
+            "image": "01_football.png",
+            "text": "Describe this image, and emphasize more on the jersey."
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_01.png",
+            "text": "Describe this image, and emphasize the marked area."
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_01.png",
+            "text": "Describe this image"
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_02.png",
+            "text": "Describe this image, and emphasize the marked area."
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_02.png",
+            "text": "Describe this image"
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_03.png",
+            "text": "Describe this image, and emphasize the marked area."
+        },
+        {
+            "question_id": 4,
+            "image": "test_hl_03.png",
+            "text": "Describe this image"
+        },
+        {
+            "question_id": 0,
+            "image": "06_mplug_2.png",
+            "text": "Why would a person find this image funny?",
+            "mask": "masks/06_mask_cam.png"
+        },
+        {
+            "question_id": -1,
+            "image": "06_mplug_2.png",
+            "text": "Why would a person find this image funny?",
+            "mask": "masks/06_mask_tooth.png"
+        },
+        {
+            "question_id": -2,
+            "image": "06_mplug_2.png",
+            "text": "Why would a person find this image funny?"
+        },
+        {
+            "question_id": -3,
+            "image": "06_mplug_2.png",
+            "text": "What is funny about this image? Describe it panel by panel.",
+            "mask": "masks/05_mask_plugs.png"
+        },
+        {
+            "question_id": 99,
+            "image": "05_mplug_1.png",
+            "text": "What is funny about this image? Describe it panel by panel."
+        },
+        {
+            "question_id": 2,
+            "image": "01_football.png",
+            "text": "Describe this image.",
+            "mask": "masks/01_mask_siu.png"
+        },
+        {
+            "question_id": 3,
+            "image": "01_football.png",
+            "text": "Describe this image.",
+            "mask": "masks/01_mask_shirt.png"
+        },
+        {
+            "question_id": 4,
+            "image": "01_football.png",
+            "text": "Who is in the image? And describe this image."
+        },
+        {
+            "question_id": 5,
+            "image": "02_klee.png",
+            "text": "What is in the image?"
+        },
+        {
+            "question_id": 6,
+            "image": "02_klee.png",
+            "text": "What is in the image?",
+            "mask": "masks/02_mask_backpack.png"
+        },
+        {
+            "question_id": 7,
+            "image": "02_klee.png",
+            "text": "What is in the image?",
+            "mask": "masks/02_mask_busket.png"
+        },
+        {
+            "question_id": 8,
+            "image": "02_klee.png",
+            "text": "What is in the image?",
+            "mask": "masks/02_mask_hat.png"
+        },
+        {
+            "question_id": 9,
+            "image": "02_klee.png",
+            "text": "What is in the image?",
+            "mask": "masks/02_mask_tag.png"
+        },
+        {
+            "question_id": 10,
+            "image": "03_titanic_poster.png",
+            "text": "Write a possible dialog based on the it."
+        },
+        {
+            "question_id": 11,
+            "image": "03_titanic_poster.png",
+            "text": "Write a possible dialog based on the it.",
+            "mask": "masks/03_mask_jack.png"
+        },
+        {
+            "question_id": 12,
+            "image": "03_titanic_poster.png",
+            "text": "Write a possible dialog based on the it.",
+            "mask": "masks/03_mask_jackrose.png"
+        },
+        {
+            "question_id": 13,
+            "image": "03_titanic_poster.png",
+            "text": "Write a possible dialog based on the it.",
+            "mask": "masks/03_mask_rose.png"
+        },
+        {
+            "question_id": 14,
+            "image": "03_titanic_poster.png",
+            "text": "Write a possible dialog based on the it.",
+            "mask": "masks/03_mask_titanic.png"
+        }
+    ]
+}
