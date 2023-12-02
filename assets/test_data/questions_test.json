@@ -1,9 +1,0 @@
-{
-    "questions":[
-        {
-            "question_id": 30,
-            "image": "test.png",
-            "text": "Describe this image."
-        }
-    ]
-}

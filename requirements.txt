@@ -1,2 +1,4 @@
 opencv-python-headless
 icecream
+openpyxl # mmbench
+protobuf # vicuna

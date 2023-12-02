@@ -165,15 +165,12 @@ def qformer_new_forward(
     if is_cross_attention:
         # attn_weight rescale.
         if self.hl_mask is not None:
-            hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attention_scores)
+            hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attention_scores).to(attention_scores.dtype)
+            hl_mask *= self.attention_weight
             bs = hl_mask.shape[0]
-            attention_scores[
-                : bs // 2, hl_mask[: bs // 2] == 1
-            ] += self.attention_weight
-            if bs > 1:  # deactivate
-                attention_scores[
-                    bs // 2 :, hl_mask[bs // 2 :] == 1
-                ] -= self.attention_weight
+            # deactivate the last half of the sequence.
+            if bs > 1:
+                hl_mask[bs//2:] *= -1
             # single forward, no need to update hl_mask here.
     ###############################################
 

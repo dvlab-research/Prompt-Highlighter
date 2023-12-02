@@ -31,7 +31,7 @@ from llava.mm_utils import (
 
 from highlighter_modules.guidance import ProbCFGLogitsProcessor
 from highlighter_modules.utils import txt_highlight_mask
-from highlighter_modules.attention_llama import llama_modify_inf
+from highlighter_modules.attention_llama_llava import llava_modify_inf
 from PIL import Image
 import math
 
@@ -151,7 +151,7 @@ def eval_model(args):
         input_ids = input_ids.repeat(2, 1)
         image_tensor = image_tensor.repeat(2, 1, 1, 1)
         
-        llama_modify_inf(model)
+        llava_modify_inf(model)
         
         with torch.inference_mode():
             output_ids = model.generate(

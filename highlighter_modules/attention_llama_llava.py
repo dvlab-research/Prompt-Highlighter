@@ -21,16 +21,62 @@ def llama_attn_forward(
     output_attentions: bool = False,
     use_cache: bool = False,
     ):
+    # a copy of the original forward.
+    bsz, q_len, _ = hidden_states.size()
+    query_states = self.q_proj(hidden_states).view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+    key_states = self.k_proj(hidden_states).view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+    value_states = self.v_proj(hidden_states).view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+    
+    kv_seq_len = key_states.shape[-2]
+    if past_key_value is not None:
+        kv_seq_len += past_key_value[0].shape[-2]
+    cos, sin = self.rotary_emb(value_states, seq_len=kv_seq_len)
+    query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin, position_ids)
+    # [bsz, nh, t, hd]
 
-    # just a copy of the original forward
-    return self.forward(
-        hidden_states,
-        attention_mask=attention_mask,
-        position_ids=position_ids,
-        past_key_value=past_key_value,
-        output_attentions=output_attentions,
-        use_cache=use_cache,
-    )
+    if past_key_value is not None:
+        # reuse k, v, self_attention
+        key_states = torch.cat([past_key_value[0], key_states], dim=2)
+        value_states = torch.cat([past_key_value[1], value_states], dim=2)
+
+    past_key_value = (key_states, value_states) if use_cache else None
+
+    attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim)
+
+    if attn_weights.size() != (bsz, self.num_heads, q_len, kv_seq_len):
+        raise ValueError(
+            f"Attention weights should be of size {(bsz * self.num_heads, q_len, kv_seq_len)}, but is"
+            f" {attn_weights.size()}"
+        )
+
+    if attention_mask is not None:
+        if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
+            raise ValueError(
+                f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}"
+            )
+        attn_weights = attn_weights + attention_mask
+        attn_weights = torch.max(attn_weights, torch.tensor(torch.finfo(attn_weights.dtype).min))
+
+    # upcast attention to fp32
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
+
+    attn_output = torch.matmul(attn_weights, value_states)
+
+    if attn_output.size() != (bsz, self.num_heads, q_len, self.head_dim):
+        raise ValueError(
+            f"`attn_output` should be of size {(bsz, self.num_heads, q_len, self.head_dim)}, but is"
+            f" {attn_output.size()}"
+        )
+
+    attn_output = attn_output.transpose(1, 2)
+    attn_output = attn_output.reshape(bsz, q_len, self.hidden_size)
+
+    attn_output = self.o_proj(attn_output)
+
+    if not output_attentions:
+        attn_weights = None
+
+    return attn_output, attn_weights, past_key_value
 
 def llama_new_forward(
     self,
@@ -83,16 +129,39 @@ def llama_new_forward(
     ###############################################
     # ATTENTION ACTIVATION:
     if self.hl_mask is not None:
-        attn_mask_cur = torch.ones_like(attn_weights).to(attn_weights.device)
-        hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_mask_cur)
-        attn_mask_cur[hl_mask==1] += self.attention_weight
+        # change hl_mask to the same shape as attn_weights, change type as the same as attn_weights.
+        hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_weights).to(attn_weights.dtype)
         bs = hl_mask.shape[0]
-        # masked the last half of the sequence.
-        if bs > 1:
-            attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
         
-        attn_weights += attn_mask_cur
+        # deactivate the last half of the sequence.
+        if bs > 1:
+            # a tricky part for the mme evaluation.
+            hl_mask[:bs//2] *= self.attention_weight
+            hl_mask[bs//2:] *= -1*self.attention_weight
+        
+        attn_weights += hl_mask
         self.hl_mask = torch.cat((self.hl_mask, torch.zeros((self.num_heads, 1)).cuda()), dim=-1)
+
+    # TODO: original implementation.
+    # attn_weight rescale.
+    # if self.hl_mask is not None:
+    #     attn_mask_cur = torch.ones_like(attn_weights).to(attn_weights.device)
+    #     # print(self.hl_mask.shape, attn_mask_cur.shape)
+    #     hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_mask_cur)
+    #     total_num = self.hl_mask.sum()/self.num_heads
+    #     total_length = self.hl_mask.shape[-1]
+    #     # print(self.attention_weight, attn_mask_cur.shape)
+    #     attn_mask_cur[hl_mask==1] += self.attention_weight
+    #     bs = attn_mask_cur.shape[0]
+        
+    #     # TODO: masked the last half of the sequence.
+    #     # print(bs)
+    #     if bs > 1:
+    #         attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
+    #     # attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
+        
+    #     attn_weights += attn_mask_cur
+    #     self.hl_mask = torch.cat((self.hl_mask, torch.zeros((self.num_heads, 1)).cuda()), dim=-1)
     ###############################################
 
     # upcast attention to fp32
@@ -145,8 +214,8 @@ def reset_llama_model(self):
         if isinstance(module, LlamaAttention):
             module.forward = module.ori_forward
             
-# inference modification functions.
-def prepare_hl_inputs_for_generation(
+# inference modification functions for llava.
+def prepare_llava_hl_inputs_for_generation(
     self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs
 ):
     if past_key_values:
@@ -171,7 +240,7 @@ def prepare_hl_inputs_for_generation(
     )
     return model_inputs
 
-def llama_hl_forward(
+def llava_hl_forward(
     self,
     input_ids: torch.LongTensor = None,
     attention_mask: Optional[torch.Tensor] = None,
@@ -185,7 +254,7 @@ def llama_hl_forward(
     images: Optional[torch.FloatTensor] = None,
     return_dict: Optional[bool] = None,
     masked_token_map: Optional[torch.LongTensor] = None,
-    attention_weight: float = .0,
+    attention_weight: float = 1.0,
     perturb_weight: float = 0.01,
 ):
     if inputs_embeds is None:
@@ -230,8 +299,9 @@ def llama_hl_forward(
     )
 
 
-def llama_modify_inf(model):
-    model.forward = types.MethodType(llama_hl_forward, model)
-    model.prepare_inputs_for_generation = types.MethodType(prepare_hl_inputs_for_generation, model)
+def llava_modify_inf(model):
+    model.forward = types.MethodType(llava_hl_forward, model)
+    model.prepare_inputs_for_generation = types.MethodType(prepare_llava_hl_inputs_for_generation, model)
     model.modify_attention = types.MethodType(modify_llama_attention, model)
     model.reset_model = types.MethodType(reset_llama_model, model)
+    
