@@ -12,8 +12,8 @@ Control text generation by highlighting our prompt! Prompt Highlighter is a trai
   - [Overview](#overview)
   - [MileStones](#milestones)
   - [Quick Start](#quick-start)
-    - [Vicuna (LLaMA-based LLMs)](#vicuna-llama-based-llms)
     - [LLaVA](#llava)
+    - [Vicuna (LLaMA-based LLMs)](#vicuna-llama-based-llms)
     - [InstructBLIP](#instructblip)
     - [InternLM-VLComposer](#internlm-vlcomposer)
   - [Method](#method)
@@ -27,7 +27,7 @@ Control text generation by highlighting our prompt! Prompt Highlighter is a trai
 * [X] `20231201` LLaVA highlighter benchmark test inference (MMBench & MME)
 * [X] `20231201` LLaVA partial highlight inference
 * [X] `20231202` Vicuna (LLM) partial highlight inference
-* [ ] `20231202` InstructBLIP partial highlight inference
+* [X] `20231202` InstructBLIP partial highlight inference
 * [ ] `20231204` Current Code Release!
 * [ ] `TBD` InternLM-VLComposer benchmark test inference
 
@@ -40,7 +40,6 @@ conda create -n highlighter python=3.10 -y
 conda activate highlighter
 pip install -r requirements.txt
 ```
-
 
 ### LLaVA
 
@@ -58,13 +57,11 @@ pip install -e .
 
 **Model Download**: Please refer to [LLaVAv1.5 Model Zoo](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md) to get the base pretrained model.
 
-
 **Partial Highlighting task**: We provide examples in `assets/test_data/questions_descriptions.json`, you may add your new case to test our method.
 
 ```bash
 python examples/llava_test.py
 ```
-
 
 **Descriptive task** (highlighting all input contexts): We provide examples in `assets/test_data/questions_descriptions.json`, you may add your new case to test our method.
 
@@ -76,10 +73,9 @@ We will also provide a scripte for descriptive COCO caption generation (TODO her
 
 If you want to add your customized data, please provide a squared image that use a darker (uint color < 128) marked region as the ***highlighter area***. And add your case in the json file.
 
-
 **Benchmark Test**: Please refer to [evaluation data](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md#mme) to get your benchmark dataset (MMBench & MME). Benchmark result:
 
-| Hyper-Param              | MME-perception | MMBench-dev | MMBench-test |
+| Method                   | MME-perception | MMBench-dev | MMBench-test |
 | :----------------------- | :------------: | :---------: | :----------: |
 | baseline (LLaVAv1.5-13B) |     1531.3     |    67.7    |     67.0     |
 | Ours                     |     1552.5     |    69.7    |     69.5     |
@@ -104,7 +100,6 @@ bash examples/eval_scripts/mme_hl.sh 1.3 2.0 0.01
 
 You may found evaluated metric at `base_models/LLaVA/playground/data/eval/MME/eval_tool/answers/llava-v1.5-13b-hl-1.3-2.0-0.01/eval.log`
 
-
 ### Vicuna (LLaMA-based LLMs)
 
 We provide a script to test the partial highlighter of the pure language input.
@@ -119,8 +114,19 @@ python examples/llama_test.py \
 
 Here you may change your input prompt and hlighted segments by passing `--txt` and `--hl`, respectively. If you want to pass multiple highlighted segments, you may use a `<s>` to split them. For example, you can pass `--hl "write a summary<s>make it compact."` to highlight multiple requirements.
 
-
 ### InstructBLIP
+
+Install latest LAVIS `2023-11-30` in base_models. If you already have one, you can use the installed one in your own enviornment.
+
+To run the InstructBLIP-Vicuna, you need to add the llm path (vicuna-13b v1.1) to the key  `llm_model` in the configuration file `base_models/LAVIS/lavis/configs/models/blip2/blip2_instruct_vicuna13b.yaml`.
+
+```bash
+# Please install with your highlighter env activated.
+cd base_models
+git clone https://github.com/salesforce/LAVIS.git
+cd LAVIS
+pip install -e .
+```
 
 **Partial Highlighting task**: Run examples  in `assets/test_data/questions_descriptions.json`, you may add your new case to test our method.
 
@@ -129,7 +135,6 @@ Here you may change your input prompt and hlighted segments by passing `--txt` a
 ```python
 python examples/instructblip_test.py
 ```
-
 
 ### InternLM-VLComposer
 
@@ -151,7 +156,6 @@ TBD.
 
 An abstract pipeline of Prompt Highlighter. Users can control the focus of generation by marking out specific image regions or text spans. Then a token-level mask $\mathbf{m}$ is created to guide the language model's inference. Motivated by the classifier-free diffusion guidance, we form regular and unconditional context pairs based on highlighted tokens, demonstrating that the autoregressive generation in models can be guided in a classifier-free way. Notably, we find that, during inference, guiding the models with highlighted tokens through the attention weights leads to more desired outputs.
 
-
 ## Cite Prompt Highlighter
 
 If you find this repo useful for your research, please consider citing the paper
@@ -160,7 +164,7 @@ If you find this repo useful for your research, please consider citing the paper
 @article{zhang2023prompt,
   title={Prompt Highlighter: Interactive Control for Multi-Modal LLMs},
   author={Yuechen Zhang, Shengju Qian, Bohao Peng, Shu Liu and Jiaya Jia},
-  journal={arXiv preprint arXiv:2311.17043},
+  journal={arXiv preprint arXiv:?????????},
   year={2023}
 }
 ```

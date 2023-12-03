@@ -60,7 +60,7 @@ def eval_model(args):
     questions = json.load(open(args.question_file, "r"))["questions"]
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file).replace(
-        ".jsonl", f"-{args.cfg}-{args.attention_weight}.jsonl"
+        ".jsonl", f"-{args.cfg}-{args.attention_weight}-{args.perturb_weight}.jsonl"
     )
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
     ans_file = open(answers_file, "w")

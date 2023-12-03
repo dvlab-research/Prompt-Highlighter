@@ -129,39 +129,32 @@ def llama_new_forward(
     ###############################################
     # ATTENTION ACTIVATION:
     if self.hl_mask is not None:
+        # A relatively faster implementation.
         # change hl_mask to the same shape as attn_weights, change type as the same as attn_weights.
-        hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_weights).to(attn_weights.dtype)
-        bs = hl_mask.shape[0]
-        
-        # deactivate the last half of the sequence.
-        if bs > 1:
-            # a tricky part for the mme evaluation.
-            hl_mask[:bs//2] *= self.attention_weight
-            hl_mask[bs//2:] *= -1*self.attention_weight
+        hl_mask_pos = torch.ones_like(self.hl_mask) + self.hl_mask*self.attention_weight
+        hl_mask_neg = torch.ones_like(self.hl_mask) - self.hl_mask*(2+self.attention_weight)
+        bs = attn_weights.shape[0]
+        hl_mask_pos = hl_mask_pos.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attn_weights[:bs//2]).to(attn_weights.dtype)
+        hl_mask_neg = hl_mask_neg.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attn_weights[bs//2:]).to(attn_weights.dtype)
+        hl_mask = torch.cat((hl_mask_pos, hl_mask_neg), dim=0)
         
         attn_weights += hl_mask
+        self.hl_mask = torch.cat((self.hl_mask, torch.zeros(1).cuda()), dim=-1)
+        
+    # NOTE: original implementation. Much indexing op causes slower.
+    '''
+    attn_weight rescale.
+    if self.hl_mask is not None:
+        attn_mask_cur = torch.ones_like(attn_weights).to(attn_weights.device)
+        hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_mask_cur)
+        attn_mask_cur[hl_mask==1] += self.attention_weight
+        bs = attn_mask_cur.shape[0]
+        # masked the last half of the sequence.
+        if bs > 1:
+            attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
+        attn_weights += attn_mask_cur
         self.hl_mask = torch.cat((self.hl_mask, torch.zeros((self.num_heads, 1)).cuda()), dim=-1)
-
-    # TODO: original implementation.
-    # attn_weight rescale.
-    # if self.hl_mask is not None:
-    #     attn_mask_cur = torch.ones_like(attn_weights).to(attn_weights.device)
-    #     # print(self.hl_mask.shape, attn_mask_cur.shape)
-    #     hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_mask_cur)
-    #     total_num = self.hl_mask.sum()/self.num_heads
-    #     total_length = self.hl_mask.shape[-1]
-    #     # print(self.attention_weight, attn_mask_cur.shape)
-    #     attn_mask_cur[hl_mask==1] += self.attention_weight
-    #     bs = attn_mask_cur.shape[0]
-        
-    #     # TODO: masked the last half of the sequence.
-    #     # print(bs)
-    #     if bs > 1:
-    #         attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
-    #     # attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
-        
-    #     attn_weights += attn_mask_cur
-    #     self.hl_mask = torch.cat((self.hl_mask, torch.zeros((self.num_heads, 1)).cuda()), dim=-1)
+    '''
     ###############################################
 
     # upcast attention to fp32
@@ -189,7 +182,7 @@ def set_highlight_mask(self, highlight_mask=None):
     if highlight_mask is None:
         self.hl_mask = None
     else:
-        self.hl_mask = highlight_mask.unsqueeze(0).repeat(self.num_heads, 1)
+        self.hl_mask = highlight_mask.float() #.unsqueeze(0).repeat(self.num_heads, 1)
 
 def modify_llama_attention(self, highlight_mask, attention_weight=None):
     count = 0

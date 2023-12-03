@@ -19,7 +19,7 @@
         },
         {
             "question_id": -3,
-            "image": "06_mplug_2.png",
+            "image": "05_mplug_1.png",
             "text": "What is funny about this image? Describe it panel by panel.",
             "mask": "../masks/05_mask_plugs.png"
         },
