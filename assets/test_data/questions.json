@@ -43,7 +43,7 @@
         {
             "question_id": 4,
             "image": "01_football.png",
-            "text": "Who is in the image? And describe this image."
+            "text": "Describe this image."
         },
         {
             "question_id": 5,

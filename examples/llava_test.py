@@ -224,7 +224,10 @@ def eval_model(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-path", type=str, default="/dataset/yczhang/PromptHighlighter/BenchVis/models/LLaVA/checkpoints/llava-v1.5-13b")
+    parser.add_argument("--model-path", type=str, default="/dataset/yczhang/BenchVis/models/LLaVA/checkpoints/llava-v1.5-13b")
+    
+    # llava-v1-0719-336px-lora-merge-vicuna-13b-v1.3")
+    #llava-v1.5-13b")
     parser.add_argument("--model-base", type=str, default=None)
     parser.add_argument("--image-folder", type=str, default="assets/test_data/images")
     parser.add_argument(
@@ -239,8 +242,8 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
-    parser.add_argument("--cfg", type=float, default=2.0)
-    parser.add_argument("--attn", type=float, default=7.0)
+    parser.add_argument("--cfg", type=float, default=1.3)
+    parser.add_argument("--attn", type=float, default=2.0)
     parser.add_argument("--perturb_weight", type=float, default=0.01)
     args = parser.parse_args()
     if "llava-v1.5" in args.model_path or "336" in args.model_path:

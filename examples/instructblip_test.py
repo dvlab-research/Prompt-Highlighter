@@ -120,7 +120,9 @@ def eval_model(args):
             output = model.generate(
                 {"image": image_tensor, "prompt": cur_prompt}, num_beams=args.num_beams, 
                 logits_processor = [ProbCFGLogitsProcessor(guidance_scale=args.cfg, use_log=True)], 
-                perturb_weight=args.perturb_weight, masked_img_token_map=masked_img_token_map)
+                perturb_weight=args.perturb_weight,
+                attention_weight=args.attention_weight,
+                masked_img_token_map=masked_img_token_map)
             
         ans_id = shortuuid.uuid()
         ans_file.write(json.dumps({"question_id": idx,
@@ -152,8 +154,8 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
-    parser.add_argument("--cfg", type=float, default=2.0)
-    parser.add_argument("--attn-weight", type=float, default=100.0)
+    parser.add_argument("--cfg", type=float, default=1.3)
+    parser.add_argument("--attn-weight", type=float, default=20.0)
     parser.add_argument("--model-name", type=str, default="vicuna13b")
     parser.add_argument("--beam", type=int, default=1)
     parser.add_argument("--perturb_weight", type=float, default=0.01)
