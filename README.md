@@ -1,6 +1,10 @@
 # Prompt Highlighter: Interactive Control for Multi-Modal LLMs
 
 ![logo](assets/logo.png)
+<p align="center">
+<a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/project_page-aa55dd'></a>
+<a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/arXiv_paper-ee7744'></a>
+</p>
 
 Control text generation by highlighting our prompt! Prompt Highlighter is a training-free inference pipeline, which facilitates token-level user interactions for customized generation. Our method is compatible for both LLMs and VLMs.
 

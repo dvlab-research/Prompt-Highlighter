@@ -26,7 +26,7 @@ from llava.utils import disable_torch_init
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from highlighter_modules.guidance import ProbCFGLogitsProcessor
 from highlighter_modules.utils import txt_highlight_mask
-from highlighter_modules.attention_llama_llava import modify_llama_attention
+from highlighter_modules.attention_llama_llava import llama_modify_inf
 from PIL import Image
 import math
 
@@ -50,17 +50,15 @@ def eval_model(args):
         model = AutoModelForCausalLM.from_pretrained(args.model_path, torch_dtype=torch.float16)
         tokenizer = AutoTokenizer.from_pretrained(args.model_path)
 
-
     qs = args.txt + "\n"
 
-    conv = conv_templates[args.conv_mode].copy()
-    conv.append_message(conv.roles[0], qs)
-    conv.append_message(conv.roles[1], None)
-    prompt = conv.get_prompt()
+    prompt = "USER: " + qs + "ASSISTANT:"
     
     print("PROMPT:", prompt)
     
-    qs_highlighted_parts = [args.hl]
+    qs_highlighted_parts = args.hl.split("<s>")
+    if len(args.hl) == 0:
+        qs_highlighted_parts = []
     highlighted_mask, tokens = txt_highlight_mask(
         tokenizer, prompt, qs_highlighted_parts
     )
@@ -78,11 +76,13 @@ def eval_model(args):
     hl_mask_ = hl_mask.unsqueeze(0).unsqueeze(2).cuda()
     hl_mask_ = hl_mask_.expand_as(embed)
     hl_mask_[hl_mask_==1] = args.perturb_weight
+    hl_mask_[hl_mask_==0] = 1.0
     
     highlighted_embed = (embed*hl_mask_).half()
     cfg_batched_input = torch.cat([embed, highlighted_embed])
-    modify_llama_attention(model, hl_mask, attention_weight=args.attention_weight)
+    llama_modify_inf(model)
     
+    model.modify_attention(hl_mask, attention_weight=args.attn)
     with torch.inference_mode():
         output_ids = model.generate(
             inputs_embeds = cfg_batched_input,
@@ -92,27 +92,28 @@ def eval_model(args):
                 ProbCFGLogitsProcessor(guidance_scale=args.cfg, use_log=True)
             ],
         )
-    
+
     outputs = tokenizer.batch_decode(
         output_ids, skip_special_tokens=True
     )[0]
     outputs = outputs.strip()
-    print("ASSISTANT:", outputs)
+    print(f"ASSISTANT:", outputs)
+    model.reset_model()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", type=str, default="/dataset/pretrained-models/vicuna-13b-v1.1")
     parser.add_argument(
-        "--txt", type=str, default="Please give me a plan to learn computer vision."
+        "--txt", type=str, default="Please give me a detailed plan to eat healthy and to lose weight."
     )
     parser.add_argument(
-        "--hl", type=str, default="computer vision."
+        "--hl", type=str, default="eat healthy"
     )
-    parser.add_argument("--conv-mode", type=str, default="vicuna_v1")
+    # parser.add_argument("--conv-mode", type=str, default="vicuna_v1")
     parser.add_argument("--num_beams", type=int, default=1)
     parser.add_argument("--cfg", type=float, default=1.5)
-    parser.add_argument("--attn", type=float, default=5.0)
+    parser.add_argument("--attn", type=float, default=3.0)
     parser.add_argument("--perturb_weight", type=float, default=0.01)
     args = parser.parse_args()
 

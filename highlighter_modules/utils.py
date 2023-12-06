@@ -1,6 +1,5 @@
 # utilization functions for the highlighter.
 
-
 # return the mask and tokens for the highlighted text prompt.
 def txt_highlight_mask(tokenizer, txt_prompt, highlighted_idx_range):
     # Convert text to tokens

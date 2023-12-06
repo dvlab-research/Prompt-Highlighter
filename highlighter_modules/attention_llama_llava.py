@@ -131,8 +131,8 @@ def llama_new_forward(
     if self.hl_mask is not None:
         # A relatively faster implementation.
         # change hl_mask to the same shape as attn_weights, change type as the same as attn_weights.
-        hl_mask_pos = torch.ones_like(self.hl_mask) + self.hl_mask*self.attention_weight
-        hl_mask_neg = torch.ones_like(self.hl_mask) - self.hl_mask*(2+self.attention_weight)
+        hl_mask_pos = self.hl_mask*self.attention_weight
+        hl_mask_neg = -1*self.hl_mask*(2+self.attention_weight)
         bs = attn_weights.shape[0]
         hl_mask_pos = hl_mask_pos.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attn_weights[:bs//2]).to(attn_weights.dtype)
         hl_mask_neg = hl_mask_neg.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attn_weights[bs//2:]).to(attn_weights.dtype)
@@ -140,21 +140,7 @@ def llama_new_forward(
         
         attn_weights += hl_mask
         self.hl_mask = torch.cat((self.hl_mask, torch.zeros(1).cuda()), dim=-1)
-        
-    # NOTE: original implementation. Much indexing op causes slower.
-    '''
-    attn_weight rescale.
-    if self.hl_mask is not None:
-        attn_mask_cur = torch.ones_like(attn_weights).to(attn_weights.device)
-        hl_mask = self.hl_mask.unsqueeze(0).unsqueeze(2).expand_as(attn_mask_cur)
-        attn_mask_cur[hl_mask==1] += self.attention_weight
-        bs = attn_mask_cur.shape[0]
-        # masked the last half of the sequence.
-        if bs > 1:
-            attn_mask_cur[bs//2:][hl_mask[bs//2:]==1] *= -1
-        attn_weights += attn_mask_cur
-        self.hl_mask = torch.cat((self.hl_mask, torch.zeros((self.num_heads, 1)).cuda()), dim=-1)
-    '''
+
     ###############################################
 
     # upcast attention to fp32
@@ -193,6 +179,7 @@ def modify_llama_attention(self, highlight_mask, attention_weight=None):
             if count > 0:
                 if attention_weight is not None:
                     module.attention_weight = math.log(attention_weight)
+                    # print(module.attention_weight)
                 # use a placeholder function for the original forward.
                 module.ori_forward = types.MethodType(llama_attn_forward, module)
                 module.forward = types.MethodType(llama_new_forward, module)
@@ -295,6 +282,10 @@ def llava_hl_forward(
 def llava_modify_inf(model):
     model.forward = types.MethodType(llava_hl_forward, model)
     model.prepare_inputs_for_generation = types.MethodType(prepare_llava_hl_inputs_for_generation, model)
+    model.modify_attention = types.MethodType(modify_llama_attention, model)
+    model.reset_model = types.MethodType(reset_llama_model, model)
+    
+def llama_modify_inf(model):
     model.modify_attention = types.MethodType(modify_llama_attention, model)
     model.reset_model = types.MethodType(reset_llama_model, model)
     

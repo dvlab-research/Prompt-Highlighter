@@ -246,8 +246,8 @@ def qformer_new_forward(
     if is_cross_attention:
         # A relatively faster implementation.
         # change hl_mask to the same shape as attn_weights, change type as the same as attn_weights.
-        hl_mask_pos = torch.ones_like(self.hl_mask) + self.hl_mask*self.attention_weight
-        hl_mask_neg = torch.ones_like(self.hl_mask) - self.hl_mask*(self.attention_weight)
+        hl_mask_pos = self.hl_mask*self.attention_weight
+        hl_mask_neg = -1*self.hl_mask*(2+self.attention_weight)
         bs = attention_scores.shape[0]
         hl_mask_pos = hl_mask_pos.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attention_scores[:bs//2])
         hl_mask_neg = hl_mask_neg.unsqueeze(0).unsqueeze(0).unsqueeze(2).expand_as(attention_scores[bs//2:])
@@ -255,7 +255,6 @@ def qformer_new_forward(
         
         attention_scores += hl_mask
         self.hl_mask = torch.cat((self.hl_mask, torch.zeros(1).cuda()), dim=-1)
-        # single forward, no need to update hl_mask here.
     ###############################################
 
     # Normalize the attention scores to probabilities.
