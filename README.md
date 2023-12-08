@@ -3,10 +3,10 @@
 ![logo](assets/logo.png)
 <p align="center">
 <a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/project_page-aa55dd'></a>
-<a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/arXiv_paper-ee7744'></a>
+<a href='https://arxiv.org/abs/2312.04302'><img src='https://img.shields.io/badge/arXiv_paper-ee7744'></a>
 </p>
 
-Control text generation by highlighting our prompt! Prompt Highlighter is a training-free inference pipeline, which facilitates token-level user interactions for customized generation. Our method is compatible for both LLMs and VLMs.
+Control text generation by highlighting your prompt! Prompt Highlighter is a training-free inference pipeline that facilitates token-level user interactions for a customized generation. Our method is compatible with both LLMs and VLMs.
 
 ![teaser](assets/teaser.png)
 
@@ -166,10 +166,10 @@ If you find this repo useful for your research, please consider citing the paper
 
 ```
 @article{zhang2023prompt,
-  title={Prompt Highlighter: Interactive Control for Multi-Modal LLMs},
-  author={Yuechen Zhang, Shengju Qian, Bohao Peng, Shu Liu and Jiaya Jia},
-  journal={arXiv preprint arXiv:?????????},
-  year={2023}
+      title={Prompt Highlighter: Interactive Control for Multi-Modal LLMs}, 
+      author={Yuechen Zhang and Shengju Qian and Bohao Peng and Shu Liu and Jiaya Jia},
+      year={2023},
+      journal={arXiv preprint 2312.04302},
 }
 ```
 
