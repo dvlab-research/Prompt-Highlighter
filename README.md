@@ -83,13 +83,14 @@ If you want to add your customized data, please provide a squared image that use
 | :----------------------- | :------------: | :---------: | :----------: |
 | baseline (LLaVAv1.5-13B) |     1531.3     |    67.7    |     67.0     |
 | Ours                     |     1552.5     |    69.7    |     69.5     |
+| This Repo                |     1552.5     |    70.1    |     70.7     |
 
 For MMBench, you may change your hyper-params in the following script and run:
 
 ```bash
 # gamma (guidance strength)=1.3, 
 # beta (attention weight)=3.0, 
-# alpha (perturb weight) = 0.01, default test on the dev split.
+# alpha (perturb weight) = 0.01, default test on the dev split, for the test split, use beta = 2.0.
 bash examples/eval_scripts/mmbench_hl.sh 1.3 3.0 0.01
 ```
 
