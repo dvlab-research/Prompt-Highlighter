@@ -73,17 +73,17 @@ python examples/llava_test.py
 python examples/llava_descriptions.py
 ```
 
-We will also provide a scripte for descriptive COCO caption generation (TODO here).
+We will also provide a script for descriptive COCO caption generation (TODO here).
 
-If you want to add your customized data, please provide a squared image that use a darker (uint color < 128) marked region as the ***highlighter area***. And add your case in the json file.
+If you want to add your customized data, please provide a squared image that uses a darker (uint color < 128) marked region as the ***highlighter area***. Add your case to the JSON file.
 
 **Benchmark Test**: Please refer to [evaluation data](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md#mme) to get your benchmark dataset (MMBench & MME). Benchmark result:
 
 | Method                   | MME-perception | MMBench-dev | MMBench-test |
 | :----------------------- | :------------: | :---------: | :----------: |
-| baseline (LLaVAv1.5-13B) |     1531.3     |    67.7    |     67.0     |
-| Ours                     |     1552.5     |    69.7    |     69.5     |
-| This Repo                |     1552.5     |    70.1    |     70.7     |
+| Baseline (LLaVAv1.5-13B) |     1531.3     |    67.7    |     67.0     |
+| Ours (Official Reported) |     1552.5     |    69.7    |     69.5     |
+| Ours (This Repo)         |     1552.5     |    70.1    |     70.7     |
 
 For MMBench, you may change your hyper-params in the following script and run:
 
@@ -103,13 +103,13 @@ For MME:
 bash examples/eval_scripts/mme_hl.sh 1.3 2.0 0.01
 ```
 
-You may found evaluated metric at `base_models/LLaVA/playground/data/eval/MME/eval_tool/answers/llava-v1.5-13b-hl-1.3-2.0-0.01/eval.log`
+You may found the evaluated metric at `base_models/LLaVA/playground/data/eval/MME/eval_tool/answers/llava-v1.5-13b-hl-1.3-2.0-0.01/eval.log`
 
 ### Vicuna (LLaMA-based LLMs)
 
 We provide a script to test the partial highlighter of the pure language input.
-Download the vicuna model, we use the version [Vicuna-13B-v1.1](https://huggingface.co/lmsys/vicuna-13b-v1.1). You may change to any llama-based LLMs. In this case, you will need to change the conversation prompt template as well.
-Please follow the instruction to - [install the LLaVA in the base_model](#LLaVA). If you already installed the LLaVA, you may directly test with the script:
+Download the Vicuna model. We use the version [Vicuna-13B-v1.1](https://huggingface.co/lmsys/vicuna-13b-v1.1). You may change to any llama-based LLMs. In this case, you will also need to change the conversation prompt template.
+Please follow the instructions to - [install the LLaVA in the base_model](#LLaVA). If you have already installed the LLaVA, you may directly test with the script:
 
 ```bash
 python examples/llama_test.py \
@@ -117,13 +117,13 @@ python examples/llama_test.py \
     --hl "make it compact."
 ```
 
-Here you may change your input prompt and hlighted segments by passing `--txt` and `--hl`, respectively. If you want to pass multiple highlighted segments, you may use a `<s>` to split them. For example, you can pass `--hl "write a summary<s>make it compact."` to highlight multiple requirements.
+Here you may change your input prompt and highlighted segments by passing `--txt` and `--hl`, respectively. If you want to pass multiple highlighted segments, you may use a `<s>` to split them. For example, you can pass `--hl "write a summary<s>make it compact."` to highlight multiple requirements.
 
 ### InstructBLIP
 
-Install latest LAVIS `2023-11-30` in base_models. If you already have one, you can use the installed one in your own enviornment.
+Install the latest LAVIS `2023-11-30` in base_models. If you already have one, you can use the installed one in your own environment.
 
-To run the InstructBLIP-Vicuna, you need to add the llm path (vicuna-13b v1.1) to the key  `llm_model` in the configuration file `base_models/LAVIS/lavis/configs/models/blip2/blip2_instruct_vicuna13b.yaml`.
+To run the InstructBLIP-Vicuna, you need to add the LLM path (vicuna-13b v1.1) to the key  `llm_model` in the configuration file `base_models/LAVIS/lavis/configs/models/blip2/blip2_instruct_vicuna13b.yaml`.
 
 ```bash
 # Please install with your highlighter env activated.
@@ -135,7 +135,7 @@ pip install -e .
 
 **Partial Highlighting task**: Run examples  in `assets/test_data/questions_descriptions.json`, you may add your new case to test our method.
 
-*Note*: Here we only implement a highlighting mechanism in the QFormer. We may update a hybrid highlighting (visual & text token) version in the future.
+*Note*: Here, we only implement a highlighting mechanism in the QFormer. We may update a hybrid highlighting (visual & text token) version in the future.
 
 ```python
 python examples/instructblip_test.py
