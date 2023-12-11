@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cfg=$1
-attn=$2
-perturb_weight=$3
+cfg=1.3
+attn=2.0
+perturb_weight=0.01
 exp_name=llava-v1.5-13b-hl-$cfg-$attn-$perturb_weight
 
 python examples/eval_scripts/llava_vqa_loader_hl.py \

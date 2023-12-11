@@ -1,6 +1,7 @@
 # Prompt Highlighter: Interactive Control for Multi-Modal LLMs
 
 ![logo](assets/logo.png)
+
 <p align="center">
 <a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/project_page-aa55dd'></a>
 <a href='https://arxiv.org/abs/2312.04302'><img src='https://img.shields.io/badge/arXiv_paper-ee7744'></a>
@@ -88,19 +89,14 @@ If you want to add your customized data, please provide a squared image that use
 For MMBench, you may change your hyper-params in the following script and run:
 
 ```bash
-# gamma (guidance strength)=1.3, 
-# beta (attention weight)=3.0, 
-# alpha (perturb weight) = 0.01, default test on the dev split, for the test split, use beta = 2.0.
-bash examples/eval_scripts/mmbench_hl.sh 1.3 3.0 0.01
+bash examples/eval_scripts/mmbench_dev_hl.sh
+bash examples/eval_scripts/mmbench_test_hl.sh
 ```
 
 For MME:
 
 ```bash
-# gamma (guidance strength)=1.3, 
-# beta (attention weight)=2.0, 
-# alpha (perturb weight) = 0.01
-bash examples/eval_scripts/mme_hl.sh 1.3 2.0 0.01
+bash examples/eval_scripts/mme_hl.sh
 ```
 
 You may found the evaluated metric at `base_models/LLaVA/playground/data/eval/MME/eval_tool/answers/llava-v1.5-13b-hl-1.3-2.0-0.01/eval.log`

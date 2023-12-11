@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cfg=$1
-attn=$2
-perturb_weight=$3
+cfg=1.3
+attn=2.0
+perturb_weight=0.01
 exp_name=llava-v1.5-13b-hl-$cfg-$attn-$perturb_weight
 
 SPLIT="mmbench_test_20230712"
@@ -26,4 +26,4 @@ python base_models/LLaVA/scripts/convert_mmbench_for_submission.py \
     --upload-dir base_models/LLaVA/playground/data/eval/mmbench/answers_upload/$SPLIT \
     --experiment $exp_name
 
-python examples/eval_scripts/eval_mmbench.py --filename base_models/LLaVA/playground/data/eval/mmbench/answers/$SPLIT/$exp_name.jsonl
+# python examples/eval_scripts/eval_mmbench.py --filename base_models/LLaVA/playground/data/eval/mmbench/answers/$SPLIT/$exp_name.jsonl
