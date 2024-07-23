@@ -1,4 +1,4 @@
-# Prompt Highlighter: Interactive Control for Multi-Modal LLMs
+# [CVPR2024] Prompt Highlighter: Interactive Control for Multi-Modal LLMs
 
 ![logo](assets/logo.png)
 
@@ -6,6 +6,8 @@
 <a href='https://julianjuaner.github.io/projects/PromptHighlighter/'><img src='https://img.shields.io/badge/project_page-aa55dd'></a>
 <a href='https://arxiv.org/abs/2312.04302'><img src='https://img.shields.io/badge/arXiv_paper-ee7744'></a>
 </p>
+
+This is the official implementation of the CVPR2024 paper *Prompt Highlighter: Interactive Control for Multi-Modal LLMs.*
 
 Control text generation by highlighting your prompt! Prompt Highlighter is a training-free inference pipeline that facilitates token-level user interactions for a customized generation. Our method is compatible with both LLMs and VLMs.
 
