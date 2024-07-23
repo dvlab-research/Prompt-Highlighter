@@ -162,11 +162,12 @@ An abstract pipeline of Prompt Highlighter. Users can control the focus of gener
 If you find this repo useful for your research, please consider citing the paper
 
 ```
-@article{zhang2023prompt,
-      title={Prompt Highlighter: Interactive Control for Multi-Modal LLMs}, 
-      author={Yuechen Zhang and Shengju Qian and Bohao Peng and Shu Liu and Jiaya Jia},
-      year={2023},
-      journal={arXiv preprint 2312.04302},
+@inproceedings{zhang2024prompt,
+  title={Prompt Highlighter: Interactive Control for Multi-Modal LLMs},
+  author={Zhang, Yuechen and Qian, Shengju and Peng, Bohao and Liu, Shu and Jia, Jiaya},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={13215--13224},
+  year={2024}
 }
 ```
 
